@@ -27,7 +27,7 @@ export interface RequestOptions{
 export class APICall {
   apiUrl: string = '';
 
-  authToken: string | undefined = '';
+  authToken: string = '';
 
   /**
    *
@@ -36,7 +36,7 @@ export class APICall {
    */
   constructor(apiUrl: string, authToken?: string) {
     this.apiUrl = apiUrl;
-    this.authToken = authToken;
+    this.authToken = authToken || '';
   }
 
   /**
@@ -72,9 +72,14 @@ export class APICall {
       }
 
       fetch(url.toString(), options)
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.status !== 200) {
+            reject(res);
+          }
+          return res.json();
+        })
         .then((resData) => { resolve(resData); })
-        .catch(resolve);
+        .catch(reject);
     });
   }
 }

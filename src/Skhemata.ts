@@ -65,11 +65,12 @@ export class Skhemata implements SkhemataInterface {
    * @returns boolean of auth status
    */
   init(): Promise<boolean> {
-    const authToken = localStorage.getItem(AUTH_TOKEN) || undefined;
+    const authToken = window.localStorage.getItem(AUTH_TOKEN) || undefined;
 
     return new Promise((resolve) => {
       if (!authToken) {
         resolve(false);
+        return;
       }
       this.authenticate({ authToken })
         .then(() => resolve(true))
@@ -101,27 +102,47 @@ export class Skhemata implements SkhemataInterface {
     };
 
     return this.api.send(request)
-      .then((res: any) => {
-        this.api.authToken = res.authToken;
-        localStorage.set(AUTH_TOKEN, this.api.authToken);
-        window.dispatchEvent(new CustomEvent('skhemata-login', {
-          detail: {
-            authToken: this.api.authToken,
-          },
-        }));
-        return res;
+      .then((res) => {
+        this.handleAuthResponse(res);
       });
   }
 
+  authenticateOkta(idToken: string): Promise<any> {
+    const request: APIRequest = {
+      requestMethod: RequestMethod.POST,
+      endpoint: 'authenticate/okta/social',
+      data: {
+        id_token: idToken,
+      },
+    };
+    return this.api.send(request)
+      .then((res) => {
+        this.handleAuthResponse(res);
+      });
+  }
+
+  handleAuthResponse(res: any): any {
+    if (res?.auth_token) {
+      this.api.authToken = res.auth_token;
+      window.localStorage.setItem(AUTH_TOKEN, this.api.authToken);
+      window.dispatchEvent(new CustomEvent('skhemata-login', {
+        detail: {
+          authToken: this.api.authToken,
+        },
+      }));
+    }
+    return res;
+  }
+
   logout() {
-    this.api.authToken = undefined;
+    this.api.authToken = '';
     localStorage.removeItem(AUTH_TOKEN);
     window.dispatchEvent(new CustomEvent('skhemata-logout'));
   }
 
-  /***************
+  /** *************
   * Campaign *
-  ***************/
+  ************** */
 
   /**
    *
@@ -200,12 +221,12 @@ export class Skhemata implements SkhemataInterface {
       .catch(() => new Error('Error'));
   }
 
-  /***************
+  /** *************
   * SUBSCRIPTION *
-  ***************/
+  ************** */
 
   /**
-   * 
+   *
    * @param data data to create the subscription
    * @returns Subscription object
    */

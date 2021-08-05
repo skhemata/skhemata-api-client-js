@@ -6,7 +6,8 @@
   "scripts": {
     "test": "tsc",
     "build": "tsc",
-    "prepare": "tsc"
+    "prepare": "tsc",
+    "start": "tsc --watch"
   },
   "repository": {
     "type": "git",
