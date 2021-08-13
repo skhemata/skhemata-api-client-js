@@ -1,6 +1,6 @@
 {
   "name": "@skhemata/skhemata-api-client-js",
-  "version": "1.3.0-rc.1",
+  "version": "1.3.0-rc.2",
   "description": "Skhemata Javascript REST API Client. This web component provides Javascript interface for Skhemata Universal API.",
   "main": "dist/index.js",
   "scripts": {
