@@ -32,6 +32,14 @@ interface Auth {
   password?: string
 }
 
+interface Registration {
+  email: string,
+  password: string,
+  confirm_password: string,
+  first_name: string,
+  last_name: string,
+}
+
 /**
  * Campaign Search Inerface
  */
@@ -132,6 +140,15 @@ export class Skhemata implements SkhemataInterface {
       }));
     }
     return res;
+  }
+
+  register(data: Registration): Promise<any> {
+    const request: APIRequest = {
+      requestMethod: RequestMethod.POST,
+      endpoint: 'register',
+      data,
+    };
+    return this.api.send(request);
   }
 
   logout() {
